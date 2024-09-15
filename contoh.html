@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Router</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        nav {
+            margin-bottom: 20px;
+        }
+
+        a {
+            margin-right: 10px;
+            text-decoration: none;
+            color: blue;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="/" data-navigate>Home</a>
+        <a href="/about" data-navigate>About</a>
+        <a href="/contact" data-navigate>Contact</a>
+    </nav>
+    <main id="content"></main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const routes = {
+                '/': '<h1>Home Page</h1><p>Welcome to the Home Page.</p>',
+                '/about': '<h1>About Page</h1><p>This is the About Page.</p>',
+                '/contact': '<h1>Contact Page</h1><p>Contact us through this page.</p>',
+            };
+
+            const content = document.getElementById('content');
+
+            function navigate(event) {
+                event.preventDefault();
+                const path = event.target.getAttribute('href');
+                history.pushState(null, null, path);
+                renderPage(path);
+            }
+
+            function renderPage(path) {
+                if (routes[path]) {
+                    content.innerHTML = routes[path];
+                } else {
+                    content.innerHTML = '<h1>404 Not Found</h1><p>The page you are looking for does not exist.</p>';
+                }
+            }
+
+            // Handle back/forward navigation
+            window.addEventListener('popstate', () => {
+                renderPage(window.location.pathname);
+            });
+
+            // Attach click event listener to navigation links
+            document.querySelectorAll('a[data-navigate]').forEach(anchor => {
+                anchor.addEventListener('click', navigate);
+            });
+
+            // Initial load
+            const initialPath = window.location.pathname;
+            if (routes[initialPath]) {
+                renderPage(initialPath);
+            } else {
+                // Redirect to home if path is not found
+                history.replaceState(null, null, '/');
+                renderPage('/');
+            }
+        });
+
+    </script>
+</body>
+
+</html>
